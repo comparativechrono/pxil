@@ -22,6 +22,7 @@ from __future__ import annotations
 
 import argparse
 import colorsys
+import contextlib
 import datetime as _dt
 import hashlib
 import json
@@ -156,20 +157,26 @@ def read(path) -> tuple[str, dict]:
 
 
 def main(argv=None) -> int:
-    ap = argparse.ArgumentParser(prog="python -m pxil", description="Print pxil files as FASTA, or their metadata.")
+    """The command line: ``pxil FILE…`` (or ``python -m pxil FILE…``)."""
+    prog = "python -m pxil" if sys.argv and str(sys.argv[0]).endswith(".py") else "pxil"
+    ap = argparse.ArgumentParser(prog=prog, description="Print pxil files as FASTA, or their metadata.")
     ap.add_argument("files", nargs="+", help="pxil files")
     ap.add_argument("--info", action="store_true", help="print the metadata instead")
     ap.add_argument("--line", type=int, default=60, help="FASTA line length (default 60)")
+    ap.add_argument("-o", "--output", help="write to this file instead of printing")
     a = ap.parse_args(argv)
-    for f in a.files:
-        seq, meta = read(f)
-        if a.info:
-            print(json.dumps(meta, indent=2, ensure_ascii=False))
-            continue
-        label = " ".join(str(meta[k]) for k in ("id", "name", "kind") if meta.get(k))
-        print(f">{label or f}")
-        for i in range(0, len(seq), a.line):
-            print(seq[i : i + a.line])
+    with open(a.output, "w", encoding="utf-8") if a.output else contextlib.nullcontext(sys.stdout) as out:
+        for f in a.files:
+            seq, meta = read(f)
+            if a.info:
+                print(json.dumps(meta, indent=2, ensure_ascii=False), file=out)
+                continue
+            label = " ".join(str(meta[k]) for k in ("id", "name", "kind") if meta.get(k))
+            print(f">{label or f}", file=out)
+            for i in range(0, len(seq), a.line):
+                print(seq[i : i + a.line], file=out)
+    if a.output:
+        print(f"wrote {a.output}", file=sys.stderr)
     return 0
 
 

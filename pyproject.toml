@@ -22,6 +22,9 @@ dependencies = ["Pillow>=9.1"]
 [project.optional-dependencies]
 test = ["pytest>=7"]
 
+[project.scripts]
+pxil = "pxil:main"
+
 [project.urls]
 Homepage = "https://github.com/comparativechrono/pxil"
 Specification = "https://github.com/comparativechrono/pxil/blob/main/SPEC.md"

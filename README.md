@@ -59,11 +59,13 @@ print(meta["id"], len(sequence), sequence[:10])   # ENSP00000269305 394 MEEPQSDP
 pxil.write("my.transcript.pxil.png", "ATGGAGGAGCCGCAGTCAGATCC", kind="transcript", id="my-1")
 ```
 
-From the command line it prints pxil files as FASTA, or their metadata:
+From the command line, `pxil` (or `python -m pxil`) prints pxil files as
+FASTA, or their metadata:
 
 ```sh
-python -m pxil examples/*.pxil.png
-python -m pxil --info examples/TP53-201_ENST00000269305.transcript.pxil.png
+pxil examples/*.pxil.png
+pxil examples/*.protein.pxil.png -o proteins.fa
+pxil --info examples/TP53-201_ENST00000269305.transcript.pxil.png
 ```
 
 Without the module, any PNG reader will do: read the palette indices, keep

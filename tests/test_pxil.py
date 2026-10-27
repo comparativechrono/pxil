@@ -114,6 +114,13 @@ def test_command_line(tmp_path):
     root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     out = subprocess.run([sys.executable, "-m", "pxil", "--line", "50", str(p)], capture_output=True, text=True, cwd=root, check=True).stdout
     assert out.splitlines() == [">ENST00000000011 PIXL1-201 transcript", "ATG" * 16 + "AT", "G" + "ATG" * 13]
+    # to a file, with -o; and the metadata with --info
+    fa = tmp_path / "t.fa"
+    run = subprocess.run([sys.executable, "-m", "pxil", str(p), "-o", str(fa)], capture_output=True, text=True, cwd=root, check=True)
+    assert run.stdout == "" and "wrote" in run.stderr
+    assert fa.read_text().splitlines()[0] == ">ENST00000000011 PIXL1-201 transcript"
+    assert pxil.main(["--info", str(p), "-o", str(tmp_path / "t.json")]) == 0
+    assert '"kind": "transcript"' in (tmp_path / "t.json").read_text()
 
 
 @pytest.mark.skipif(not os.path.isdir(EXAMPLES), reason="no examples")
