@@ -68,6 +68,14 @@ pxil examples/*.protein.pxil.png -o proteins.fa
 pxil --info examples/TP53-201_ENST00000269305.transcript.pxil.png
 ```
 
+Each sequence is named by its `id`, `name` and `kind`
+(`>ENSP00000269305 TP53-201 protein`). A person's own version of a sequence,
+such as [gpxil2pxil](https://github.com/comparativechrono/Gpxil-scratchpad/tree/main/packages/gpxil2pxil)
+makes from a genome, has the person and the haplotype joined to its id
+(`>ENSP00000269305_HG002-hap1 TP53-201 protein`), so the reference's and each
+haplotype's sequences keep names of their own in one FASTA file, ready for an
+alignment program.
+
 Without the module, any PNG reader will do: read the palette indices, keep
 the first `length`, and look each up in `alphabet` (see
 [`SPEC.md`](SPEC.md), section 8).

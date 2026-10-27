@@ -26,6 +26,7 @@ import contextlib
 import datetime as _dt
 import hashlib
 import json
+import os
 import sys
 
 from PIL import Image, PngImagePlugin
@@ -156,8 +157,39 @@ def read(path) -> tuple[str, dict]:
     return "".join(table[i] for i in data), meta
 
 
+def fasta_name(meta: dict, fallback: str = "") -> str:
+    """The FASTA header of a pxil file's sequence: its id, then its name and kind (``ENSP00000269305 TP53-201 protein``).
+
+    A person's own version of a sequence (``haplotype`` in the metadata, with ``sample``) has the person and the
+    haplotype joined to its id, so that each sequence keeps a name of its own in one FASTA file:
+    ``ENSP00000269305_HG002-hap1 TP53-201 protein``.
+    """
+    ident = str(meta.get("id") or "")
+    if meta.get("haplotype") is not None:
+        whose = f"{meta['sample']}-hap{meta['haplotype']}" if meta.get("sample") else f"hap{meta['haplotype']}"
+        ident = f"{ident}_{whose}" if ident else whose
+    words = [ident] + [str(meta[k]) for k in ("name", "kind") if meta.get(k)]
+    return " ".join(w for w in words if w) or fallback
+
+
 def main(argv=None) -> int:
     """The command line: ``pxil FILE…`` (or ``python -m pxil FILE…``)."""
+    try:
+        code = _main(argv)
+        sys.stdout.flush()  # (here, so that a reader that has gone is noticed here, not as Python exits)
+        return code
+    except BrokenPipeError:
+        # the reader stopped early (pxil … | head): not an error of ours, so no traceback. Python's own advice:
+        # point stdout at /dev/null, so that the flush at exit doesn't fail again
+        try:
+            devnull = os.open(os.devnull, os.O_WRONLY)
+            os.dup2(devnull, sys.stdout.fileno())
+        except (OSError, ValueError, AttributeError):
+            pass
+        return 1
+
+
+def _main(argv=None) -> int:
     prog = "python -m pxil" if sys.argv and str(sys.argv[0]).endswith(".py") else "pxil"
     ap = argparse.ArgumentParser(prog=prog, description="Print pxil files as FASTA, or their metadata.")
     ap.add_argument("files", nargs="+", help="pxil files")
@@ -171,8 +203,7 @@ def main(argv=None) -> int:
             if a.info:
                 print(json.dumps(meta, indent=2, ensure_ascii=False), file=out)
                 continue
-            label = " ".join(str(meta[k]) for k in ("id", "name", "kind") if meta.get(k))
-            print(f">{label or f}", file=out)
+            print(f">{fasta_name(meta, str(f))}", file=out)
             for i in range(0, len(seq), a.line):
                 print(seq[i : i + a.line], file=out)
     if a.output:

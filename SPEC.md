@@ -111,6 +111,17 @@ Optional keys, for sequences with a place in a genome:
 | `palette` | the name of the colours used |
 | `description` | free text |
 
+Optional keys, for a person's own version of a sequence (made from their
+genome, such as a protein from one of their haplotypes):
+
+| Key | Value |
+|---|---|
+| `sample` | the person's identifier in the genome the sequence was made from |
+| `haplotype` | which of their copies: `1` or `2` |
+| `notes` | short remarks, as a list of strings, such as how the sequence differs from the reference's: `["differs from the reference: P72R"]` |
+
+A sequence made from a genome without `haplotype` is the reference's.
+
 Writers MAY add other keys. Readers MUST ignore keys they do not know.
 
 The kinds are:
@@ -180,7 +191,7 @@ from PIL import Image
 
 im = Image.open("TP53-201_ENST00000269305.transcript.pxil.png")
 meta = json.loads(im.info["pxil"])
-indices = list(im.getdata())[: meta["length"]]
+indices = im.tobytes()[: meta["length"]]   # one byte a pixel
 sequence = "".join(meta["alphabet"][i] for i in indices)
 ```
 

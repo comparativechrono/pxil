@@ -123,6 +123,36 @@ def test_command_line(tmp_path):
     assert '"kind": "transcript"' in (tmp_path / "t.json").read_text()
 
 
+def test_fasta_names_of_a_persons_sequences(tmp_path):
+    # the reference's protein and each haplotype's, as gpxil2pxil writes them: one name each
+    meta = {"kind": "protein", "id": "ENSP00000269305", "name": "TP53-201", "sample": "HG002"}
+    pxil.write(tmp_path / "ref.protein.pxil.png", "MEEPQSDPSVEPPLSQETFS", **{k: v for k, v in meta.items() if k != "sample"})
+    pxil.write(tmp_path / "h1.protein.pxil.png", "MEEPQSDPSVEPPLSQETFS", haplotype=1, notes=["differs from the reference: P72R"], **meta)
+    pxil.write(tmp_path / "h2.protein.pxil.png", "MEEPQSDPSVEPPLSQETFS", haplotype=2, **meta)
+    fa = tmp_path / "all.fa"
+    assert pxil.main([str(tmp_path / f) for f in ("ref.protein.pxil.png", "h1.protein.pxil.png", "h2.protein.pxil.png")] + ["-o", str(fa)]) == 0
+    assert [x for x in fa.read_text().splitlines() if x.startswith(">")] == [
+        ">ENSP00000269305 TP53-201 protein",
+        ">ENSP00000269305_HG002-hap1 TP53-201 protein",
+        ">ENSP00000269305_HG002-hap2 TP53-201 protein",
+    ]
+    assert pxil.fasta_name({"haplotype": 2}, "x.pxil.png") == "hap2"
+    assert pxil.fasta_name({}, "x.pxil.png") == "x.pxil.png"
+
+
+def test_a_reader_that_stops_early(tmp_path):
+    # pxil … | head: no traceback when the pipe closes
+    p = tmp_path / "long.sequence.pxil.png"
+    pxil.write(p, "ACGT" * 50000, kind="sequence", id="long")
+    root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    run = subprocess.run(f'"{sys.executable}" -m pxil --line 10 "{p}" | head -n 2', shell=True, capture_output=True, text=True, cwd=root)
+    assert run.stdout.splitlines() == [">long sequence", "ACGTACGTAC"]
+    assert "Traceback" not in run.stderr and "BrokenPipe" not in run.stderr and "Exception ignored" not in run.stderr, run.stderr
+    # (true reads nothing and is gone before anything is written: the write fails, every time)
+    run = subprocess.run(f'"{sys.executable}" -m pxil "{p}" | true', shell=True, capture_output=True, text=True, cwd=root)
+    assert "Traceback" not in run.stderr and "BrokenPipe" not in run.stderr and "Exception ignored" not in run.stderr, run.stderr
+
+
 @pytest.mark.skipif(not os.path.isdir(EXAMPLES), reason="no examples")
 def test_examples_from_the_gpxil_browser():
     files = sorted(f for f in os.listdir(EXAMPLES) if f.endswith(".pxil.png"))
