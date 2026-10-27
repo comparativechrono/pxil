@@ -65,6 +65,16 @@ def test_protein_and_other_alphabets(tmp_path):
     assert dict(chunks(rna))["IHDR"][8] == 8  # still 8-bit with a small alphabet
 
 
+def test_n_looks_like_no_base_or_mixture():
+    # the classic colours of gpxiltools: N near-black and never paler, since the mean of C (blue) and T (yellow) is grey
+    cols = pxil.default_colours(pxil.DNA)
+    n = pxil.DNA.index("N")
+    assert cols[n] == cols[pxil.DNA.index("n")] == (32, 32, 32)
+    assert cols[pxil.DNA.index("Y")] == (128, 128, 128)  # C or T
+    assert all(cols[i] != cols[n] for i in range(len(pxil.DNA)) if pxil.DNA[i] not in "Nn")
+    assert cols[pxil.DNA.index("a")] == (255, 115, 115)  # repeats are paler
+
+
 def test_greyscale_files_are_read(tmp_path):
     seq = "ACGT" * 5
     codes = bytes(pxil.DNA.index(c) for c in seq)

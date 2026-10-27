@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pxil"
-version = "0.1.0"
+version = "0.1.1"
 description = "Read and write pxil files: one sequence as a picture, one pixel per residue"
 readme = "README.md"
 requires-python = ">=3.9"

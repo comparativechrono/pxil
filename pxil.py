@@ -31,7 +31,7 @@ import sys
 
 from PIL import Image, PngImagePlugin
 
-__version__ = "0.1.0"
+__version__ = "0.1.1"
 SPEC_VERSION = "0.1"
 KINDS = ("gene", "transcript", "protein", "sequence")
 
@@ -56,7 +56,11 @@ class PxilError(ValueError):
 
 
 def _dna_colours() -> list[tuple[int, int, int]]:
-    """A red, C blue, G green, T yellow, N grey; ambiguity codes mixed; repeats paler."""
+    """A red, C blue, G green, T yellow, N near-black; ambiguity codes mixed; repeats paler.
+
+    These are the classic colours of gpxiltools. N is near-black, not grey, because the mean of C and T is mid-grey,
+    and it is not made paler when soft-masked, so that it never looks like a base or a mixture of bases.
+    """
     base = {1: (255, 0, 0), 2: (0, 0, 255), 4: (0, 255, 0), 8: (255, 255, 0)}
     out = []
     for code in range(32):
@@ -64,11 +68,11 @@ def _dna_colours() -> list[tuple[int, int, int]]:
         if low == 0:
             c = (255, 255, 255)
         elif low == 15:
-            c = (128, 128, 128)
+            c = (32, 32, 32)
         else:
             parts = [base[b] for b in (1, 2, 4, 8) if low & b]
             c = tuple(round(sum(p[i] for p in parts) / len(parts)) for i in range(3))
-        if code & 16 and low:
+        if code & 16 and low and low != 15:
             c = tuple(round(v + (255 - v) * 0.45) for v in c)
         out.append(c)
     return out
