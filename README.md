@@ -47,7 +47,7 @@ The full description is [`SPEC.md`](SPEC.md), also as a PDF,
 [`pxil.py`](pxil.py) is a single module that needs only Pillow:
 
 ```sh
-pip install git+https://github.com/comparativechrono/pxil
+pip install pxil
 ```
 
 ```python
@@ -76,6 +76,11 @@ the first `length`, and look each up in `alphabet` (see
 pip install pillow pytest
 python -m pytest tests
 ```
+
+To release a version: set it in `pyproject.toml` and in `pxil.py`'s
+`__version__`, merge, and publish a GitHub release tagged with the version
+(`v0.1.0`). The workflow `release.yml` then tests the module, builds it and
+publishes it to [PyPI](https://pypi.org/project/pxil/) by trusted publishing.
 
 ## Licence
 
