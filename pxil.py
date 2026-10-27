@@ -6,13 +6,13 @@ module reads and writes them:
 
     import pxil
 
-    sequence, meta = pxil.read("TP53-201_ENST00000269305.transcript.pxil")
-    pxil.write("p53.protein.pxil", "MEEPQSDPSV", kind="protein", id="ENSP00000269305")
+    sequence, meta = pxil.read("TP53-201_ENST00000269305.transcript.pxil.png")
+    pxil.write("p53.protein.pxil.png", "MEEPQSDPSV", kind="protein", id="ENSP00000269305")
 
 and prints them as FASTA from the command line:
 
-    python -m pxil TP53-201_ENST00000269305.transcript.pxil
-    python -m pxil --info TP53-201_ENSP00000269305.protein.pxil
+    python -m pxil TP53-201_ENST00000269305.transcript.pxil.png
+    python -m pxil --info TP53-201_ENSP00000269305.protein.pxil.png
 
 Copyright (c) 2026 Chronomic Medicine Group, Department of Genomic Medicine,
 University of Cambridge. MIT licence.

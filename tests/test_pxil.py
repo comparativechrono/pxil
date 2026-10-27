@@ -37,7 +37,7 @@ def chunks(path):
 
 def test_dna_round_trip(tmp_path):
     seq = "ACGTNacgtnRYKMSWBDHV" * 7 + "ACG"
-    p = tmp_path / "x.gene.pxil"
+    p = tmp_path / "x.gene.pxil.png"
     meta = pxil.write(p, seq, kind="gene", id="ENSG00000000001", name="PIXL1", width=30)
     got, m = pxil.read(p)
     assert got == seq
@@ -54,12 +54,12 @@ def test_dna_round_trip(tmp_path):
 
 def test_protein_and_other_alphabets(tmp_path):
     prot = "MEEPQSDPSVEPPLSQETFSDLWKLLPENNVLSPLPSQAMDDLMLSPDDIEQWFTEDPGPDEAPRMPEAAPPVAPAPAAPTPAAPAPAPSWPLSSSVPSQKTYQGSYGFRLGFLHSGTAKSVTCTYSPALNKMFCQLAKTCPVQLWVDSTPPPGTRVRAMAIYKQSQHMTEVVRRCPHHERCSDSDGLAPPQHLIRVEGNLRVEYLDDRNTFRHSVVVPYEPPEVGSDCTTIHYNYMCNSSCMGGMNRRPILTIITLEDSSGNLLGRNSFEVRVCACPGRDRRTEEENLRKKGEPHHELPPGSTKRALPNNTSSSPQPKKKPLDGEYFTLQIRGRERFEMFRELNEALELKDAQAGKEPGGSRAHSSHLKSKKGQSTSRHKKLMFKTEGPDSD*"
-    p = tmp_path / "TP53-201_ENSP00000269305.protein.pxil"
+    p = tmp_path / "TP53-201_ENSP00000269305.protein.pxil.png"
     pxil.write(p, prot, kind="protein", id="ENSP00000269305", genetic_code="standard")
     got, m = pxil.read(p)
     assert got == prot and m["alphabet"] == pxil.PROTEIN and m["kind"] == "protein"
     assert m["sha256"] == __import__("hashlib").sha256(prot.encode()).hexdigest()
-    rna = tmp_path / "r.pxil"
+    rna = tmp_path / "r.pxil.png"
     pxil.write(rna, "ACGUUGCA", alphabet="-ACGUN", width=3)
     assert pxil.read(rna)[0] == "ACGUUGCA"
     assert dict(chunks(rna))["IHDR"][8] == 8  # still 8-bit with a small alphabet
@@ -71,23 +71,23 @@ def test_greyscale_files_are_read(tmp_path):
     im = Image.frombytes("L", (8, 3), codes + bytes(4))
     info = PngImagePlugin.PngInfo()
     info.add_itxt("pxil", json.dumps({"pxil": "0.1", "kind": "sequence", "alphabet": pxil.DNA, "length": 20, "width": 8}), zip=True)
-    p = tmp_path / "g.pxil"
+    p = tmp_path / "g.pxil.png"
     im.save(p, format="PNG", pnginfo=info)
     assert pxil.read(p)[0] == seq
 
 
 def test_errors(tmp_path):
     with pytest.raises(pxil.PxilError):
-        pxil.write(tmp_path / "a.pxil", "ACGTX", kind="gene")  # X is not DNA
+        pxil.write(tmp_path / "a.pxil.png", "ACGTX", kind="gene")  # X is not DNA
     with pytest.raises(pxil.PxilError):
-        pxil.write(tmp_path / "a.pxil", "ACGT", kind="genome")
+        pxil.write(tmp_path / "a.pxil.png", "ACGT", kind="genome")
     plain = tmp_path / "plain.png"
     Image.new("P", (4, 1)).save(plain)
     with pytest.raises(pxil.PxilError, match="no pxil metadata"):
         pxil.read(plain)
 
     def fake(meta, size=(4, 1), pixels=b"\x01\x02\x04\x08"):
-        p = tmp_path / "f.pxil"
+        p = tmp_path / "f.pxil.png"
         im = Image.frombytes("P", size, pixels)
         im.putpalette([v for i in range(256) for v in (i, i, i)])  # 256 colours: an 8-bit PNG
         info = PngImagePlugin.PngInfo()
@@ -109,7 +109,7 @@ def test_errors(tmp_path):
 
 
 def test_command_line(tmp_path):
-    p = tmp_path / "t.transcript.pxil"
+    p = tmp_path / "t.transcript.pxil.png"
     pxil.write(p, "ATG" * 30, kind="transcript", id="ENST00000000011", name="PIXL1-201")
     root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     out = subprocess.run([sys.executable, "-m", "pxil", "--line", "50", str(p)], capture_output=True, text=True, cwd=root, check=True).stdout
@@ -118,7 +118,7 @@ def test_command_line(tmp_path):
 
 @pytest.mark.skipif(not os.path.isdir(EXAMPLES), reason="no examples")
 def test_examples_from_the_gpxil_browser():
-    files = sorted(f for f in os.listdir(EXAMPLES) if f.endswith(".pxil"))
+    files = sorted(f for f in os.listdir(EXAMPLES) if f.endswith(".pxil.png"))
     assert files
     for f in files:
         seq, meta = pxil.read(os.path.join(EXAMPLES, f))

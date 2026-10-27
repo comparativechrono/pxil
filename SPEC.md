@@ -25,7 +25,7 @@ whole assemblies in one file, and checks such as reference digests.
 | | gpxil | pxil |
 |---|---|---|
 | Holds | whole genomes and one sample's variants | one sequence |
-| Container | TIFF (`.gpxil.tif`) | PNG (`.pxil`, `.gene.pxil`, `.transcript.pxil`, `.protein.pxil`) |
+| Container | TIFF (`.gpxil.tif`) | PNG (`.pxil.png`, `.gene.pxil.png`, `.transcript.pxil.png`, `.protein.pxil.png`) |
 | Residues | DNA, as gpxil codes | any alphabet: DNA, RNA, protein, ... |
 | Coordinates | every pixel has a genomic position | optional, as metadata |
 | Intended use | storage, exchange and analysis of genomes | quick looks, sharing and analysis of single sequences |
@@ -152,15 +152,21 @@ Any other alphabet MAY be used, for example `-ACGUN` for RNA.
 
 ## 7. File names
 
-pxil files SHOULD be named `<label>.<kind>.pxil`, for example
-`TP53-201_ENST00000269305.transcript.pxil`,
-`TP53-201_ENSP00000269305.protein.pxil` or
-`TP53_ENSG00000141510.gene.pxil`, and plain `<label>.pxil` for the kind
-`sequence`. Files that come from a database SHOULD have its identifier in the
-name. Readers MUST NOT rely on the name: the metadata says what a file is.
+pxil files SHOULD be named `<label>.<kind>.pxil.png`, for example
+`TP53-201_ENST00000269305.transcript.pxil.png`,
+`TP53-201_ENSP00000269305.protein.pxil.png` or
+`TP53_ENSG00000141510.gene.pxil.png`, and plain `<label>.pxil.png` for the
+kind `sequence`. Files that come from a database SHOULD have its identifier
+in the name.
 
-A pxil file is a PNG file, so image software opens it when it is renamed or
-when the software looks at the content rather than the name.
+The name ends in `.png`, the container, so that computers, web browsers and
+image software treat a pxil file as the PNG image it is. The `.pxil` before
+it says that the pixels are a sequence, and the kind says which sort, just as
+`.gpxil.tif` marks gpxil's TIFF files. Files from earlier drafts of this
+specification, named `<label>.<kind>.pxil`, are the same format and need only
+be renamed.
+
+Readers MUST NOT rely on the name: the metadata says what a file is.
 
 ## 8. Reading and writing
 
@@ -172,7 +178,7 @@ with Python and Pillow:
 import json
 from PIL import Image
 
-im = Image.open("TP53-201_ENST00000269305.transcript.pxil")
+im = Image.open("TP53-201_ENST00000269305.transcript.pxil.png")
 meta = json.loads(im.info["pxil"])
 indices = list(im.getdata())[: meta["length"]]
 sequence = "".join(meta["alphabet"][i] for i in indices)

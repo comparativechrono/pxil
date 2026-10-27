@@ -17,9 +17,9 @@ downloads genes, transcripts and proteins as pxil files:
 
 | File | What it holds |
 |---|---|
-| `TP53_ENSG00000141510.gene.pxil` | the gene's genomic sequence, 5′ to 3′, introns and soft-masked repeats included |
-| `TP53-201_ENST00000269305.transcript.pxil` | the transcript's spliced sequence, 5′ to 3′ |
-| `TP53-201_ENSP00000269305.protein.pxil` | the protein, one pixel per amino acid |
+| `TP53_ENSG00000141510.gene.pxil.png` | the gene's genomic sequence, 5′ to 3′, introns and soft-masked repeats included |
+| `TP53-201_ENST00000269305.transcript.pxil.png` | the transcript's spliced sequence, 5′ to 3′ |
+| `TP53-201_ENSP00000269305.protein.pxil.png` | the protein, one pixel per amino acid |
 
 These three files are in [`examples/`](examples/).
 
@@ -36,8 +36,8 @@ These three files are in [`examples/`](examples/).
   (`-ACMGRSVTWYHKDBN-acmgrsvtwyhkdbn`, lower case for soft-masked repeats);
   protein uses `-ACDEFGHIKLMNPQRSTVWYUOBZJX*`. Any other alphabet of up to
   256 symbols is allowed.
-- Files are named `<label>.<kind>.pxil`, with the database identifier in the
-  label.
+- Files are named `<label>.<kind>.pxil.png`, with the database identifier in
+  the label. The `.png` ending means they open as pictures anywhere.
 
 The full description is [`SPEC.md`](SPEC.md), also as a PDF,
 [`pxil-spec.pdf`](pxil-spec.pdf).
@@ -53,17 +53,17 @@ pip install git+https://github.com/comparativechrono/pxil
 ```python
 import pxil
 
-sequence, meta = pxil.read("examples/TP53-201_ENSP00000269305.protein.pxil")
+sequence, meta = pxil.read("examples/TP53-201_ENSP00000269305.protein.pxil.png")
 print(meta["id"], len(sequence), sequence[:10])   # ENSP00000269305 394 MEEPQSDPSV
 
-pxil.write("my.transcript.pxil", "ATGGAGGAGCCGCAGTCAGATCC", kind="transcript", id="my-1")
+pxil.write("my.transcript.pxil.png", "ATGGAGGAGCCGCAGTCAGATCC", kind="transcript", id="my-1")
 ```
 
 From the command line it prints pxil files as FASTA, or their metadata:
 
 ```sh
-python -m pxil examples/*.pxil
-python -m pxil --info examples/TP53-201_ENST00000269305.transcript.pxil
+python -m pxil examples/*.pxil.png
+python -m pxil --info examples/TP53-201_ENST00000269305.transcript.pxil.png
 ```
 
 Without the module, any PNG reader will do: read the palette indices, keep
