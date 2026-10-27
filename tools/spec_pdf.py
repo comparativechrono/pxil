@@ -47,7 +47,8 @@ def main(argv=None) -> int:
         head.write_text(f"<style>{CSS}</style>")
         page_html = pathlib.Path(tmp, "spec.html")
         subprocess.run(
-            ["pandoc", a.markdown, "--from", "gfm", "--to", "html5", "--standalone", "--metadata", f"pagetitle={a.title}", "--include-in-header", str(head), "--output", str(page_html)],
+            ["pandoc", a.markdown, "--from", "gfm", "--to", "html5", "--standalone", "--embed-resources", "--resource-path", str(pathlib.Path(a.markdown).resolve().parent),
+             "--metadata", f"pagetitle={a.title}", "--include-in-header", str(head), "--output", str(page_html)],
             check=True,
         )
         footer = (
