@@ -16,7 +16,7 @@ back exactly and used for quick analysis.
 pxil is deliberately permissive and small. It suits pictures of single
 sequences that people download, share, compare and feed into image-analysis
 tools, such as the transcripts and proteins downloaded from the
-[Gpxil browser](https://comparativechrono.github.io/Gpxil-browser/). It is
+[Gpxil browser](https://pixelverse.cam/). It is
 **not** meant for long-term storage of genomes or samples: for that, use
 [gpxil](https://github.com/comparativechrono/Gpxil), which keeps reference
 coordinates, several planes per contig (reference, genotypes, quality),

@@ -28,7 +28,7 @@ pxil = "pxil:main"
 [project.urls]
 Homepage = "https://github.com/comparativechrono/pxil"
 Specification = "https://github.com/comparativechrono/pxil/blob/main/SPEC.md"
-"Gpxil browser" = "https://comparativechrono.github.io/Gpxil-browser/"
+"Gpxil browser" = "https://pixelverse.cam/"
 
 [tool.setuptools]
 py-modules = ["pxil"]

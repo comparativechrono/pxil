@@ -12,7 +12,7 @@ of single sequences. It is not meant for keeping genomes: that is what
 [gpxil](https://github.com/comparativechrono/Gpxil), the genome pixel image
 format, is for.
 
-The [Gpxil browser](https://comparativechrono.github.io/Gpxil-browser/)
+The [Gpxil browser](https://pixelverse.cam/)
 downloads genes, transcripts and proteins as pxil files:
 
 | File | What it holds |
